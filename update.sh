@@ -1103,7 +1103,56 @@ remove_attendedsysupgrade() {
         fi
     done
 }
+pre_cache_opkg() {
+    local pkg_name="opkg-2025.11.05~80503d94"
+    local expected_hash="41fb2c79ce6014e28f7dd0cd8c65efe803986278f2587d1d4681883d8847d87c"
+    local dl_path="$BUILD_DIR/dl"
+    local tar_file="$pkg_name.tar.zst"
+    local tar_path="$dl_path/$tar_file"
 
+    # 检查是否已存在且哈希匹配的文件
+    if [ -f "$tar_path" ]; then
+        local current_hash=$("$BUILD_DIR/staging_dir/host/bin/mkhash" sha256 "$tar_path")
+        if [ "$current_hash" = "$expected_hash" ]; then
+            echo "✅ Pre-cached $tar_file exists and hash matches. Skipping."
+            return 0
+        else
+            echo "⚠️ Existing file hash mismatch. Removing and re-downloading."
+            rm -f "$tar_path"
+        fi
+    fi
+
+    echo "🚀 Pre-caching $pkg_name from Git repository..."
+
+    # 创建临时目录进行操作
+    local temp_dir=$(mktemp -d)
+    cd "$temp_dir"
+
+    # 克隆源码并切换到指定提交
+    git clone --filter=blob:none https://git.openwrt.org/project/opkg-lede.git "$pkg_name"
+    cd "$pkg_name"
+    git checkout 80503d94e356476250adaf1f669ee955ec26de76
+
+    # 创建源码压缩包（模拟下载文件的格式）
+    tar --numeric-owner --owner=0 --group=0 --mode=a-s --sort=name -c . | zstd -T0 --ultra -20 -c > "../$tar_file"
+
+    # 将制作好的压缩包移动到 dl 目录
+    mkdir -p "$dl_path"
+    mv "../$tar_file" "$tar_path"
+
+    # 清理临时目录
+    cd - > /dev/null
+    rm -rf "$temp_dir"
+
+    # 最终校验
+    local final_hash=$("$BUILD_DIR/staging_dir/host/bin/mkhash" sha256 "$tar_path")
+    if [ "$final_hash" = "$expected_hash" ]; then
+        echo "✅ Successfully pre-cached $tar_file with correct hash."
+    else
+        echo "❌ Failed to pre-cache $tar_file. Hash mismatch: expected $expected_hash, got $final_hash"
+        return 1
+    fi
+}
 main() {
     clone_repo
     clean_up
@@ -1111,7 +1160,7 @@ main() {
     update_feeds
     remove_unwanted_packages
     remove_tweaked_packages
-    update_homeproxy
+    # update_homeproxy
     fix_default_set
     fix_miniupnpd
     update_golang
@@ -1126,7 +1175,7 @@ main() {
     update_tcping
     add_ax6600_led
     set_custom_task
-    apply_passwall_tweaks
+    # apply_passwall_tweaks
     update_nss_pbuf_performance
     set_build_signature
     update_nss_diag
@@ -1134,15 +1183,15 @@ main() {
     fix_compile_coremark
     update_dnsmasq_conf
     add_backup_info_to_sysupgrade
-    update_mosdns_deconfig
+    # update_mosdns_deconfig
     fix_quickstart
     update_oaf_deconfig
     add_timecontrol
     add_gecoosac
-    add_quickfile
-    update_lucky
+    # add_quickfile
+    # update_lucky
     fix_rust_compile_error
-    update_smartdns
+    # update_smartdns
     update_diskman
     set_nginx_default_config
     update_uwsgi_limit_as
@@ -1150,18 +1199,19 @@ main() {
     update_nginx_ubus_module # 更新 nginx-mod-ubus 模块
     check_default_settings
     install_opkg_distfeeds
-    fix_easytier_mk
+    # fix_easytier_mk
     remove_attendedsysupgrade
     install_feeds
-    fix_easytier_lua
+    # fix_easytier_lua
     update_adguardhome
     update_script_priority
-    update_geoip
-    update_package "runc" "releases" "v1.2.6"
-    update_package "containerd" "releases" "v1.7.27"
-    update_package "docker" "tags" "v28.2.2"
-    update_package "dockerd" "releases" "v28.2.2"
+    # update_geoip
+    # update_package "runc" "releases" "v1.2.6"
+    # update_package "containerd" "releases" "v1.7.27"
+    # update_package "docker" "tags" "v28.2.2"
+    # update_package "dockerd" "releases" "v28.2.2"
     # apply_hash_fixes # 调用哈希修正函数
+    pre_cache_opkg
 }
 
 main "$@"
