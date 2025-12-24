@@ -1105,7 +1105,7 @@ remove_attendedsysupgrade() {
 }
 pre_cache_opkg() {
     local pkg_name="opkg-2025.11.05~80503d94"
-    local expected_hash="41fb2c79ce6014e28f7dd0cd8c65efe803986278f2587d1d4681883d8847d87c"
+    local expected_hash="5364e72c52499b50e172db9bcf9ef1f6a69fc09c3ade151b630016e94049495d"
     local dl_path="$BUILD_DIR/dl"
     local tar_file="$pkg_name.tar.zst"
     local tar_path="$dl_path/$tar_file"
