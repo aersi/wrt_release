@@ -1103,96 +1103,6 @@ remove_attendedsysupgrade() {
         fi
     done
 }
-pre_cache_opkg() {
-    local pkg_name="opkg-2025.11.05~80503d94"
-    local expected_hash="5364e72c52499b50e172db9bcf9ef1f6a69fc09c3ade151b630016e94049495d"
-    local dl_path="$BUILD_DIR/dl"
-    local tar_file="$pkg_name.tar.zst"
-    local tar_path="$dl_path/$tar_file"
-
-    # 检查是否已存在且哈希匹配的文件
-    if [ -f "$tar_path" ]; then
-        local current_hash=$("$BUILD_DIR/staging_dir/host/bin/mkhash" sha256 "$tar_path")
-        if [ "$current_hash" = "$expected_hash" ]; then
-            echo "✅ Pre-cached $tar_file exists and hash matches. Skipping."
-            return 0
-        else
-            echo "⚠️ Existing file hash mismatch. Removing and re-downloading."
-            rm -f "$tar_path"
-        fi
-    fi
-
-    echo "🚀 Pre-caching $pkg_name from Git repository..."
-
-    # 创建临时目录进行操作
-    local temp_dir=$(mktemp -d)
-    cd "$temp_dir"
-
-    # 克隆源码并切换到指定提交
-    git clone --filter=blob:none https://git.openwrt.org/project/opkg-lede.git "$pkg_name"
-    cd "$pkg_name"
-    git checkout 80503d94e356476250adaf1f669ee955ec26de76
-
-    # 创建源码压缩包（模拟下载文件的格式）
-    tar --numeric-owner --owner=0 --group=0 --mode=a-s --sort=name -c . | zstd -T0 --ultra -20 -c > "../$tar_file"
-
-    # 将制作好的压缩包移动到 dl 目录
-    mkdir -p "$dl_path"
-    mv "../$tar_file" "$tar_path"
-
-    # 清理临时目录
-    cd - > /dev/null
-    rm -rf "$temp_dir"
-
-    # 最终校验
-    local final_hash=$("$BUILD_DIR/staging_dir/host/bin/mkhash" sha256 "$tar_path")
-    if [ "$final_hash" = "$expected_hash" ]; then
-        echo "✅ Successfully pre-cached $tar_file with correct hash."
-    else
-        echo "❌ Failed to pre-cache $tar_file. Hash mismatch: expected $expected_hash, got $final_hash"
-        return 1
-    fi
-}
-downgrade_opkg_to_stable() {
-    local opkg_makefile_path="$BUILD_DIR/package/system/opkg/Makefile"
-    
-    if [[ ! -f "$opkg_makefile_path" ]]; then
-        echo "❌ Opkg Makefile not found at: $opkg_makefile_path"
-        return 1
-    fi
-
-    echo "🔧 Checking opkg configuration for automated cloud build..."
-    
-    local current_version=$(grep "PKG_VERSION:=" "$opkg_makefile_path" | cut -d= -f2 | tr -d ' ')
-    local current_hash=$(grep "PKG_SOURCE_VERSION:=" "$opkg_makefile_path" | cut -d= -f2 | tr -d ' ')
-
-    echo "📋 Current opkg version: $current_version, commit: ${current_hash:0:8}..."
-
-    # 检测到问题版本时自动处理
-    if [[ "$current_version" == "2025.11.05" ]]; then
-        echo "🔄 Detected problematic version, automating version adjustment..."
-        
-        # 静默移除哈希检查，避免构建系统严格验证
-        sed -i "/^PKG_HASH:=/d" "$opkg_makefile_path"
-        
-        # 使用稳定的版本分支替代特定提交
-        local stable_version="2024.10.16"
-        local stable_branch="master"  # 或使用稳定标签如 "v2024.10.16"
-        
-        sed -i "s/PKG_VERSION:=.*/PKG_VERSION:=$stable_version/" "$opkg_makefile_path"
-        sed -i "s/PKG_SOURCE_VERSION:=.*/PKG_SOURCE_VERSION:=$stable_branch/" "$opkg_makefile_path"
-
-        echo "✅ Opkg auto-adjusted to version $stable_version (branch: $stable_branch)"
-        
-        # 清理可能存在的旧版本下载缓存
-        if [[ -d "$BUILD_DIR/dl" ]]; then
-            find "$BUILD_DIR/dl" -name "opkg-*" -exec rm -f {} \;
-            echo "🧹 Cleared existing opkg download cache."
-        fi
-    else
-        echo "ℹ️ Current opkg version ($current_version) is acceptable for cloud build."
-    fi
-}
 main() {
     clone_repo
     clean_up
@@ -1251,7 +1161,6 @@ main() {
     # update_package "docker" "tags" "v28.2.2"
     # update_package "dockerd" "releases" "v28.2.2"
     # apply_hash_fixes # 调用哈希修正函数
-    downgrade_opkg_to_stable
 }
 
 main "$@"
