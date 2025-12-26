@@ -121,14 +121,14 @@ remove_unwanted_packages() {
         "luci-app-passwall" "luci-app-ddns-go" "luci-app-rclone" "luci-app-ssr-plus"
         "luci-app-vssr" "luci-app-daed" "luci-app-dae" "luci-app-alist" "luci-app-homeproxy"
         "luci-app-haproxy-tcp" "luci-app-openclash" "luci-app-mihomo" "luci-app-appfilter"
-        "luci-app-msd_lite"
+        "luci-app-msd_lite luci-app-n2n"
     )
     local packages_net=(
         "haproxy" "xray-core" "xray-plugin" "dns2socks" "alist" "hysteria"
         "mosdns" "adguardhome" "ddns-go" "naiveproxy" "shadowsocks-rust"
         "sing-box" "v2ray-core" "v2ray-geodata" "v2ray-plugin" "tuic-client"
         "chinadns-ng" "ipt2socks" "tcping" "trojan-plus" "simple-obfs" "shadowsocksr-libev" 
-        "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter" "msd_lite"
+        "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter" "msd_lite n2n"
     )
     local packages_utils=(
         "cups"
@@ -1105,44 +1105,7 @@ remove_attendedsysupgrade() {
         fi
     done
 }
-fix_n2n_cmake_required_version() {
-    echo "🔧 Applying direct fix for n2n CMake version requirement..."
 
-    # 定义可能的 n2n 源码目录
-    local n2n_dirs=(
-        "$BUILD_DIR/feeds/packages/net/n2n"
-        "$BUILD_DIR/feeds/nuexini/n2n"
-    )
-
-    local fix_applied=0
-
-    for n2n_dir in "${n2n_dirs[@]}"; do
-        local cmake_list_path="$n2n_dir/CMakeLists.txt"
-
-        if [[ -f "$cmake_list_path" ]]; then
-            echo "✅ Found n2n CMakeLists.txt at: $cmake_list_path"
-
-            # 方案1：直接更新版本号为 3.5（推荐）
-            # 将类似 'cmake_minimum_required(VERSION 2.6)' 的语句改为 'cmake_minimum_required(VERSION 3.5)'
-            if sed -i 's/cmake_minimum_required(VERSION \([0-9]\+\(\.[0-9]\+\)*\))/cmake_minimum_required(VERSION 3.5)/' "$cmake_list_path"; then
-                echo "✅ Updated cmake_minimum_required to VERSION 3.5 in: $cmake_list_path"
-                ((fix_applied++))
-            fi
-
-            # 方案2（备选）：如果方案1的匹配不成功，尝试使用范围语法
-            # 将语句改为 'cmake_minimum_required(VERSION 3.5...3.20)'
-            # sed -i 's/cmake_minimum_required(VERSION \([0-9]\+\(\.[0-9]\+\)*\))/cmake_minimum_required(VERSION 3.5...3.20)/' "$cmake_list_path"
-
-        fi
-    done
-
-    if [[ $fix_applied -eq 0 ]]; then
-        echo "⚠️ Could not find or modify n2n CMakeLists.txt. The build might fail."
-        return 1
-    else
-        echo "✅ Successfully applied CMake version fix to $fix_applied n2n package(s)."
-    fi
-}
 main() {
     clone_repo
     clean_up
@@ -1193,7 +1156,6 @@ main() {
     remove_attendedsysupgrade
     install_feeds
     # fix_easytier_lua
-    fix_n2n_cmake_required_version
     update_adguardhome
     update_script_priority
     # update_geoip
