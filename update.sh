@@ -93,6 +93,13 @@ update_feeds() {
         echo "src-git small8 https://github.com/kenzok8/small-package" >>"$FEEDS_PATH"
     fi
 
+    # 检查并添加 NueXini_Packages 源
+    if ! grep -q "NueXini_Packages" "$FEEDS_PATH"; then
+        # 确保文件以换行符结尾
+        [ -z "$(tail -c 1 "$FEEDS_PATH")" ] || echo "" >>"$FEEDS_PATH"
+        echo "src-git nuexini https://github.com/NueXini/NueXini_Packages" >>"$FEEDS_PATH"
+    fi
+
     # 添加bpf.mk解决更新报错
     if [ ! -f "$BUILD_DIR/include/bpf.mk" ]; then
         touch "$BUILD_DIR/include/bpf.mk"
@@ -185,15 +192,12 @@ update_golang() {
 }
 
 install_small8() {
-    ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria \
-        naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata geoview v2ray-plugin \
-        tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev \
-        luci-app-passwall v2dat mosdns luci-app-mosdns adguardhome luci-app-adguardhome ddns-go \
-        luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd luci-app-store quickstart \
-        luci-app-quickstart luci-app-istorex luci-app-cloudflarespeedtest netdata luci-app-netdata \
-        lucky luci-app-lucky luci-app-openclash luci-app-homeproxy luci-app-amlogic nikki luci-app-nikki \
-        tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf easytier luci-app-easytier \
-        msd_lite luci-app-msd_lite cups luci-app-cupsd gowebdav luci-app-gowebdav
+    ./scripts/feeds install -p small8 -f tcping \
+        adguardhome luci-app-adguardhome  \
+        taskd uci-lib-taskd luci-app-store \
+        cups luci-app-cupsd gowebdav luci-app-gowebdav
+    ./scripts/feeds install -p nuexini -f n2n \
+        luci-app-n2n gowebdav luci-app-gowebdav
 }
 
 install_fullconenat() {
@@ -663,8 +667,6 @@ function add_backup_info_to_sysupgrade() {
     if [ -f "$conf_path" ]; then
         cat >"$conf_path" <<'EOF'
 /etc/AdGuardHome.yaml
-/etc/easytier
-/etc/lucky/
 EOF
     fi
 }
@@ -1134,10 +1136,10 @@ main() {
     update_dnsmasq_conf
     add_backup_info_to_sysupgrade
     # update_mosdns_deconfig
-    fix_quickstart
-    update_oaf_deconfig
+    # fix_quickstart
+    # update_oaf_deconfig
     add_timecontrol
-    add_gecoosac
+    # add_gecoosac
     # add_quickfile
     # update_lucky
     fix_rust_compile_error
