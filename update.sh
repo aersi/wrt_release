@@ -1115,26 +1115,23 @@ apply_n2n_cmake_patch() {
     echo "🔧 Applying CMake compatibility patch for n2n..."
 
     # 定义补丁源路径（您已经准备好的补丁文件）
-    local patch_source101="$BASE_PATH/patches/101-n2n--dynamic-libcap.patch"
-    local patch_source102="$BASE_PATH/patches/102-n2n-fix-cmake-version.patch"
+    local patch_source="$BASE_PATH/patches/101-n2n-fix-cmake-version.patch"
     # 定义目标路径：nuexini 源的 n2n 包 patches 目录
     local n2n_patch_dir="$BUILD_DIR/package/feeds/nuexini/n2n/patches"
-    local patch_dest101="$n2n_patch_dir/101-n2n--dynamic-libcap.patch"
-    local patch_dest102="$n2n_patch_dir/102-n2n-fix-cmake-version.patch"
+    local patch_dest="$n2n_patch_dir/101-n2n-fix-cmake-version.patch"
 
     # 1. 检查源补丁文件是否存在
-    if [ ! -f "$patch_source101" ]; then
-        echo "❌ Source patch file not found: $patch_source101"
+    if [ ! -f "$patch_source" ]; then
+        echo "❌ Source patch file not found: $patch_source"
         echo "   Please ensure the patch file exists before running this function."
         return 1
     fi
 
 
     # 3. 复制补丁文件
-    if install -Dm644 "$patch_source101" "$patch_dest101"; then
-        install -Dm644 "$patch_source102" "$patch_dest102";
+    if install -Dm644 "$patch_source" "$patch_dest"; then
         echo "✅ CMake compatibility patch has been installed to:"
-        echo "   $patch_dest101"
+        echo "   $patch_dest"
         echo "   The OpenWrt build system will apply it automatically during compilation."
     else
         echo "❌ Failed to install the patch file."
@@ -1143,8 +1140,8 @@ apply_n2n_cmake_patch() {
 
     
     # 2. 检查目标 patches 是否存在
-    if [ ! -f "$patch_source101" ]; then
-        echo "❌ destination patch file not found: $patch_source101"
+    if [ ! -f "$patch_source" ]; then
+        echo "❌ destination patch file not found: $patch_source"
     fi
 }
 
