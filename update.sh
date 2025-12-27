@@ -1123,8 +1123,8 @@ apply_n2n_cmake_patch() {
     local patch_dest102="$n2n_patch_dir/102-n2n-fix-cmake-version.patch"
 
     # 1. 检查源补丁文件是否存在
-    if [ ! -f "$patch_source" ]; then
-        echo "❌ Source patch file not found: $patch_source"
+    if [ ! -f "$patch_source101" ]; then
+        echo "❌ Source patch file not found: $patch_source101"
         echo "   Please ensure the patch file exists before running this function."
         return 1
     fi
