@@ -1117,7 +1117,7 @@ apply_n2n_cmake_patch() {
     # 定义补丁源路径（您已经准备好的补丁文件）
     local patch_source="$BASE_PATH/patches/101-n2n-fix-cmake-version.patch"
     # 定义目标路径：nuexini 源的 n2n 包 patches 目录
-    local n2n_patch_dir="$BUILD_DIR/feeds/nuexini/n2n/patches"
+    local n2n_patch_dir="$BUILD_DIR/package/feeds/nuexini/n2n/patches"
     local patch_dest="$n2n_patch_dir/101-n2n-fix-cmake-version.patch"
 
     # 1. 检查源补丁文件是否存在
