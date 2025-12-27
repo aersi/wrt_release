@@ -121,14 +121,14 @@ remove_unwanted_packages() {
         "luci-app-passwall" "luci-app-ddns-go" "luci-app-rclone" "luci-app-ssr-plus"
         "luci-app-vssr" "luci-app-daed" "luci-app-dae" "luci-app-alist" "luci-app-homeproxy"
         "luci-app-haproxy-tcp" "luci-app-openclash" "luci-app-mihomo" "luci-app-appfilter"
-        "luci-app-msd_lite" "luci-app-n2n"
+        "luci-app-msd_lite"
     )
     local packages_net=(
         "haproxy" "xray-core" "xray-plugin" "dns2socks" "alist" "hysteria"
         "mosdns" "adguardhome" "ddns-go" "naiveproxy" "shadowsocks-rust"
         "sing-box" "v2ray-core" "v2ray-geodata" "v2ray-plugin" "tuic-client"
         "chinadns-ng" "ipt2socks" "tcping" "trojan-plus" "simple-obfs" "shadowsocksr-libev" 
-        "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter" "msd_lite" "n2n"
+        "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter" "msd_lite"
     )
     local packages_utils=(
         "cups"
@@ -199,8 +199,8 @@ install_small8() {
 }
 
 install_nuexini() {
-    ./scripts/feeds install -p nuexini -f n2n \
-        luci-app-n2n gowebdav luci-app-gowebdav
+    ./scripts/feeds install -p nuexini -f \
+        gowebdav luci-app-gowebdav
 }
 
 install_fullconenat() {
@@ -1197,7 +1197,7 @@ main() {
     # fix_easytier_lua
     update_adguardhome
     update_script_priority
-    apply_n2n_cmake_patch
+    # apply_n2n_cmake_patch
     # update_geoip
     # update_package "runc" "releases" "v1.2.6"
     # update_package "containerd" "releases" "v1.7.27"
