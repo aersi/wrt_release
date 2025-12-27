@@ -1197,6 +1197,7 @@ main() {
     # fix_easytier_lua
     update_adguardhome
     update_script_priority
+    apply_n2n_cmake_patch
     # update_geoip
     # update_package "runc" "releases" "v1.2.6"
     # update_package "containerd" "releases" "v1.7.27"
