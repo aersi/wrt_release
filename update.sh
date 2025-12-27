@@ -1111,6 +1111,40 @@ remove_attendedsysupgrade() {
     done
 }
 
+apply_n2n_cmake_patch() {
+    echo "🔧 Applying CMake compatibility patch for n2n..."
+
+    # 定义补丁源路径（您已经准备好的补丁文件）
+    local patch_source="$BUILD_DIR/patches/101-n2n-fix-cmake-version.patch"
+    # 定义目标路径：nuexini 源的 n2n 包 patches 目录
+    local n2n_patch_dir="$BUILD_DIR/feeds/nuexini/n2n/patches"
+    local patch_dest="$n2n_patch_dir/101-n2n-fix-cmake-version.patch"
+
+    # 1. 检查源补丁文件是否存在
+    if [ ! -f "$patch_source" ]; then
+        echo "❌ Source patch file not found: $patch_source"
+        echo "   Please ensure the patch file exists before running this function."
+        return 1
+    fi
+
+    # 2. 检查目标 patches 是否存在
+    if [ ! -f "$n2n_patch_dir" ]; then
+        echo "❌ destination patch file not found: $n2n_patch_dir"
+        echo "   Please ensure the destination dir exists before running this function."
+        return 1
+    fi
+
+    # 3. 复制补丁文件
+    if install -Dm644 "$patch_source" "$patch_dest"; then
+        echo "✅ CMake compatibility patch has been installed to:"
+        echo "   $patch_dest"
+        echo "   The OpenWrt build system will apply it automatically during compilation."
+    else
+        echo "❌ Failed to install the patch file."
+        return 1
+    fi
+}
+
 main() {
     clone_repo
     clean_up
