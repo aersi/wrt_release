@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -185,7 +185,7 @@ if(N2N_OPTION_USE_PCAPLIB AND (NOT DEFIN
+@@ -184,7 +184,7 @@ if(N2N_OPTION_USE_PCAPLIB AND (NOT DEFIN
    # Linux Capabilities
    find_library(CAP_LIB cap)
    if(CAP_LIB)
