@@ -971,6 +971,40 @@ add_quickfile() {
     fi
 }
 
+add_luci-app-openclash() {
+    local mihomo_dir="$BUILD_DIR/package/feeds/small8/mihomo"
+    local mihomo_url="https://github.com/metacubex/mihomo.git"
+    local temp_dir="$BUILD_DIR/temp_mihomo"
+
+    echo "正在添加 openclash meta核心 mihomo..."
+    rm -rf "$mihomo_dir" 2>/dev/null
+
+    if ! git clone -b Meta --single-branch --depth=1 "$mihomo_url" "$mihomo_dir"; then
+        echo "错误：从 $mihomo_url 克隆 mihomo 仓库失败" >&2
+        exit 1
+    else
+        mv "$temp_dir/mihomo" "$mihomo_dir"
+        echo "✅ mihomo 已成功移动到目标目录。"
+        rm -rf "$temp_dir"
+    fi
+
+    local openclash_dir="$BUILD_DIR/package/feeds/small8/luci-app-openclash"
+    local repo_url="https://github.com/vernesong/OpenClash.git"
+    local temp_dir="$BUILD_DIR/temp_openclash_clone"
+
+    echo "正在添加 luci-app-openclash..."
+    rm -rf "$openclash_dir" 2>/dev/null
+
+    if ! git clone -b dev --single-branch --depth=1 "$repo_url" "$temp_dir"; then
+        echo "错误：从 $repo_url 克隆 luci-app-openclash 仓库失败" >&2
+        exit 1
+    else
+        mv "$temp_dir/luci-app-openclash" "$openclash_dir"
+        echo "✅ luci-app-openclash 已成功移动到目标目录。"
+        rm -rf "$temp_dir"
+    fi
+}
+
 # 设置 Nginx 默认配置
 set_nginx_default_config() {
     local nginx_config_path="$BUILD_DIR/feeds/packages/net/nginx-util/files/nginx.config"
@@ -1184,6 +1218,7 @@ main() {
     add_timecontrol
     # add_gecoosac
     # add_quickfile
+    add_luci-app-openclash
     # update_lucky
     fix_rust_compile_error
     # update_smartdns
