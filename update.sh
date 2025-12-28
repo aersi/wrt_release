@@ -1116,9 +1116,11 @@ apply_n2n_cmake_patch() {
 
     # 定义补丁源路径（您已经准备好的补丁文件）
     local patch_source="$BASE_PATH/patches/101-n2n-fix-cmake-version.patch"
+    local patch_source2="$BASE_PATH/patches/102-n2n-add-zstd-header.patch"
     # 定义目标路径：nuexini 源的 n2n 包 patches 目录
     local n2n_patch_dir="$BUILD_DIR/package/feeds/nuexini/n2n/patches"
     local patch_dest="$n2n_patch_dir/101-n2n-fix-cmake-version.patch"
+    local patch_dest2="$n2n_patch_dir/102-n2n-add-zstd-header.patch"
 
     # 1. 检查源补丁文件是否存在
     if [ ! -f "$patch_source" ]; then
@@ -1130,6 +1132,7 @@ apply_n2n_cmake_patch() {
 
     # 3. 复制补丁文件
     if install -Dm644 "$patch_source" "$patch_dest"; then
+        install -Dm644 "$patch_source2" "$patch_dest2"
         echo "✅ CMake compatibility patch has been installed to:"
         echo "   $patch_dest"
         echo "   The OpenWrt build system will apply it automatically during compilation."
