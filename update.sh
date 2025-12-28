@@ -195,7 +195,7 @@ install_small8() {
     ./scripts/feeds install -p small8 -f tcping \
         adguardhome luci-app-adguardhome  \
         taskd uci-lib-taskd luci-app-store \
-        cups luci-app-cupsd gowebdav luci-app-gowebdav
+        cups luci-app-cupsd
 }
 
 install_nuexini() {
