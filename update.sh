@@ -979,7 +979,7 @@ add_luci-app-openclash() {
     echo "正在添加 openclash meta核心 mihomo..."
     rm -rf "$mihomo_dir" 2>/dev/null
 
-    if ! git clone -b Meta --single-branch --depth=1 "$mihomo_url" "$mihomo_dir"; then
+    if ! git clone -b Meta --single-branch --depth=1 "$mihomo_url" "$temp_dir"; then
         echo "错误：从 $mihomo_url 克隆 mihomo 仓库失败" >&2
         exit 1
     else
