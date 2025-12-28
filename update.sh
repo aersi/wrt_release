@@ -974,18 +974,13 @@ add_quickfile() {
 add_luci-app-openclash() {
     local mihomo_dir="$BUILD_DIR/package/feeds/small8/mihomo"
     local mihomo_url="https://github.com/metacubex/mihomo.git"
-    local temp_dir="$BUILD_DIR/temp_mihomo"
 
     echo "正在添加 openclash meta核心 mihomo..."
     rm -rf "$mihomo_dir" 2>/dev/null
 
-    if ! git clone -b Meta --single-branch --depth=1 "$mihomo_url" "$temp_dir"; then
+    if ! git clone -b Meta --single-branch --depth=1 "$mihomo_url" "$mihomo_dir"; then
         echo "错误：从 $mihomo_url 克隆 mihomo 仓库失败" >&2
         exit 1
-    else
-        mv "$temp_dir/mihomo" "$mihomo_dir"
-        echo "✅ mihomo 已成功移动到目标目录。"
-        rm -rf "$temp_dir"
     fi
 
     local openclash_dir="$BUILD_DIR/package/feeds/small8/luci-app-openclash"
