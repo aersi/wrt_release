@@ -672,6 +672,12 @@ function add_backup_info_to_sysupgrade() {
     if [ -f "$conf_path" ]; then
         cat >"$conf_path" <<'EOF'
 /etc/AdGuardHome.yaml
+/usr/bin/ddns.sh
+/usr/bin/copy_cert.sh
+/root/.acme.sh
+/etc/hotplug.d/iface/98-ddns-wol
+/etc/init.d/n2n
+/etc/init.d/gowebdav
 EOF
     fi
 }
