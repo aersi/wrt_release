@@ -1238,7 +1238,7 @@ main() {
     update_argon
     update_nginx_ubus_module # 更新 nginx-mod-ubus 模块
     check_default_settings
-    install_opkg_distfeeds
+    # install_opkg_distfeeds
     # fix_easytier_mk
     remove_attendedsysupgrade
     install_feeds
